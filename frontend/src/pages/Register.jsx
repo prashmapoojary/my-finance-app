@@ -17,6 +17,10 @@ const Register = () => {
     e.preventDefault();
     setError('');
 
+    if (form.password.length < 4) {
+      return setError('Password must be at least 4 characters');
+    }
+
     if (form.password !== form.confirmPassword) {
       return setError('Passwords do not match');
     }
@@ -24,14 +28,16 @@ const Register = () => {
     setLoading(true);
     try {
       await api.post('/auth/register', { email: form.email, password: form.password });
-      const { data } = await api.post('/auth/login', { email: form.email, password: form.password });
-      localStorage.setItem('token', data.token);
-      login(data.user, false);
-      history.push('/dashboard');
+
+      // Navigate to Login page with state
+      history.push('/login', {
+        registeredEmail: form.email,
+        successMessage: 'Account registered successfully! Please sign in with your credentials to access your dashboard.',
+      });
     } catch (err) {
       setError(
         err.response?.data?.message ||
-          'Registration failed. Check backend connection or try the Live Demo!'
+          'Registration failed. Please try again or check your details.'
       );
     } finally {
       setLoading(false);

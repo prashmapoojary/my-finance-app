@@ -1,17 +1,25 @@
 import React, { useState } from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { Link, useHistory, useLocation } from 'react-router-dom';
 import api from '../utils/api';
 import useAuthStore from '../store/authStore';
 
 const Login = () => {
-  const [form, setForm] = useState({ email: '', password: '' });
+  const location = useLocation();
+  const history = useHistory();
+
+  const [form, setForm] = useState({
+    email: location.state?.registeredEmail || '',
+    password: '',
+  });
+  const [success, setSuccess] = useState(location.state?.successMessage || '');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const login = useAuthStore((s) => s.login);
-  const history = useHistory();
 
-  const handleChange = (e) =>
+  const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+    if (error) setError('');
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,7 +33,7 @@ const Login = () => {
     } catch (err) {
       setError(
         err.response?.data?.message ||
-          'Login failed. Tip: Check backend or click "Explore Live Demo" below!'
+          'Invalid credentials. Please verify your email and password.'
       );
     } finally {
       setLoading(false);
@@ -68,6 +76,7 @@ const Login = () => {
           <span>or sign in with credentials</span>
         </div>
 
+        {success && <div className="alert alert-success">{success}</div>}
         {error && <div className="alert alert-error">{error}</div>}
 
         <form onSubmit={handleSubmit}>

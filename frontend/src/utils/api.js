@@ -245,21 +245,52 @@ const api = {
     }
 
     if (url.startsWith('/auth/register')) {
-      saveRegisteredUser(data.email, data.password);
+      const email = (data.email || '').trim().toLowerCase();
+      const users = getRegisteredUsers();
+      const existing = users.find((u) => u.email.toLowerCase() === email);
+      if (existing) {
+        const err = new Error('An account with this email already exists. Please log in.');
+        err.response = {
+          data: { message: 'An account with this email already exists. Please log in.' },
+        };
+        throw err;
+      }
+
+      saveRegisteredUser(data.email.trim(), data.password);
       return {
         data: {
-          message: 'User registered successfully',
-          user: { id: Date.now(), email: data.email },
+          message: 'User registered successfully! Please sign in.',
+          user: { id: Date.now(), email: data.email.trim() },
         },
       };
     }
 
     if (url.startsWith('/auth/login')) {
-      saveRegisteredUser(data.email, data.password);
+      const email = (data.email || '').trim().toLowerCase();
+      const password = data.password;
+      const users = getRegisteredUsers();
+      const foundUser = users.find((u) => u.email.toLowerCase() === email);
+
+      if (!foundUser) {
+        const err = new Error('No account found with this email. Please register first.');
+        err.response = {
+          data: { message: 'No account found with this email. Please register first.' },
+        };
+        throw err;
+      }
+
+      if (foundUser.password !== password) {
+        const err = new Error('Incorrect password. Credentials do not match.');
+        err.response = {
+          data: { message: 'Incorrect password. Credentials do not match.' },
+        };
+        throw err;
+      }
+
       return {
         data: {
           token: 'jwt-auth-session-token-' + Date.now(),
-          user: { id: Date.now(), email: data.email || 'user@example.com' },
+          user: { id: foundUser.id, email: foundUser.email },
         },
       };
     }
