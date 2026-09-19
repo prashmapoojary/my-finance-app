@@ -1,12 +1,16 @@
 import axios from 'axios';
 
-// Base Axios instance pointing to local Express server
+const API_BASE_URL = process.env.REACT_APP_API_URL
+  ? `${process.env.REACT_APP_API_URL.replace(/\/$/, '')}/api`
+  : 'http://localhost:5000/api';
+
+// Base Axios instance pointing to Express server
 const axiosInstance = axios.create({
-  baseURL: 'http://localhost:5000/api',
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 3000, // 3s timeout so it fails fast and falls back if backend is not running
+  timeout: 4000, // 4s timeout so it fails fast and falls back if backend is not running
 });
 
 axiosInstance.interceptors.request.use((config) => {
