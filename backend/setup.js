@@ -42,6 +42,31 @@ const createTables = async () => {
             );
         `);
 
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS goals (
+                id SERIAL PRIMARY KEY,
+                userId INTEGER REFERENCES users(id) ON DELETE CASCADE,
+                title VARCHAR(255) NOT NULL,
+                targetAmount DECIMAL(10, 2) NOT NULL,
+                currentAmount DECIMAL(10, 2) DEFAULT 0,
+                deadline DATE,
+                category VARCHAR(100)
+            );
+        `);
+
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS subscriptions (
+                id SERIAL PRIMARY KEY,
+                userId INTEGER REFERENCES users(id) ON DELETE CASCADE,
+                name VARCHAR(255) NOT NULL,
+                amount DECIMAL(10, 2) NOT NULL,
+                billingCycle VARCHAR(50) DEFAULT 'monthly',
+                nextBilling DATE,
+                category VARCHAR(100),
+                status VARCHAR(50) DEFAULT 'active'
+            );
+        `);
+
         console.log("Database tables created or already exist.");
     } catch (error) {
         console.error("Error creating tables:", error);

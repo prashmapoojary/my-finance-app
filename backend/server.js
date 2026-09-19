@@ -18,6 +18,8 @@ app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/wallets', require('./routes/walletRoutes'));
 app.use('/api/transactions', require('./routes/transactionRoutes'));
 app.use('/api/budgets', require('./routes/budgetRoutes'));
+app.use('/api/goals', require('./routes/goalRoutes'));
+app.use('/api/subscriptions', require('./routes/subscriptionRoutes'));
 app.use('/api/reports', require('./routes/reportRoutes'));
 
 // Start server
